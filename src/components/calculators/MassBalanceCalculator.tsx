@@ -87,6 +87,7 @@ export const MassBalanceCalculator = () => {
     { name: "", quantity: "" }
   ]);
   const [result, setResult] = useState<ReactionResult | null>(null);
+  const [unit, setUnit] = useState<"kg" | "L" | "mL">("kg");
 
   const calculateBalance = () => {
     const reaction = reactions[selectedReaction];
@@ -107,6 +108,19 @@ export const MassBalanceCalculator = () => {
     setResult(null);
   };
 
+  const convertUnit = (valueKg: number) => {
+    if (unit === "L") {
+      return valueKg; // Assumindo densidade ≈ 1 kg/L (água)
+    } else if (unit === "mL") {
+      return valueKg * 1000; // kg → L → mL
+    }
+    return valueKg; // kg
+  };
+
+  const getUnitLabel = () => {
+    return unit;
+  };
+
   return (
     <Card className="shadow-card">
       <CardHeader>
@@ -119,20 +133,36 @@ export const MassBalanceCalculator = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="reaction">Tipo de Reação</Label>
-          <Select value={selectedReaction} onValueChange={handleReactionChange}>
-            <SelectTrigger id="reaction">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(reactions).map(([key, reaction]) => (
-                <SelectItem key={key} value={key}>
-                  {reaction.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="reaction">Tipo de Reação</Label>
+            <Select value={selectedReaction} onValueChange={handleReactionChange}>
+              <SelectTrigger id="reaction">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(reactions).map(([key, reaction]) => (
+                  <SelectItem key={key} value={key}>
+                    {reaction.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="unit">Unidade de Resultado</Label>
+            <Select value={unit} onValueChange={(value: "kg" | "L" | "mL") => setUnit(value)}>
+              <SelectTrigger id="unit">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="kg">Quilogramas (kg)</SelectItem>
+                <SelectItem value="L">Litros (L)</SelectItem>
+                <SelectItem value="mL">Mililitros (mL)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {reagents.map((reagent, index) => (
@@ -166,7 +196,7 @@ export const MassBalanceCalculator = () => {
               </p>
               {result.products.map((product, i) => (
                 <p key={i} className="text-lg font-bold text-primary-foreground">
-                  {product.name}: {product.quantity.toFixed(3)} kg
+                  {product.name}: {convertUnit(product.quantity).toFixed(3)} {getUnitLabel()}
                 </p>
               ))}
             </div>
@@ -178,7 +208,7 @@ export const MassBalanceCalculator = () => {
                 </p>
                 {result.byproducts.map((byproduct, i) => (
                   <p key={i} className="text-base text-secondary-foreground">
-                    {byproduct.name}: {byproduct.quantity.toFixed(3)} kg
+                    {byproduct.name}: {convertUnit(byproduct.quantity).toFixed(3)} {getUnitLabel()}
                   </p>
                 ))}
               </div>
@@ -191,7 +221,7 @@ export const MassBalanceCalculator = () => {
                 </p>
                 {result.waste.filter(w => w.quantity > 0).map((waste, i) => (
                   <p key={i} className="text-base text-destructive">
-                    {waste.name}: {waste.quantity.toFixed(3)} kg
+                    {waste.name}: {convertUnit(waste.quantity).toFixed(3)} {getUnitLabel()}
                   </p>
                 ))}
               </div>
