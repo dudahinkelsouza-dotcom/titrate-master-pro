@@ -1,7 +1,6 @@
 import { MassBalanceCalculator } from "@/components/calculators/MassBalanceCalculator";
 import { TitrationCalculator } from "@/components/calculators/TitrationCalculator";
 import { ChlorineCalculator } from "@/components/calculators/ChlorineCalculator";
-import { PeroxideCalculator } from "@/components/calculators/PeroxideCalculator";
 import { FlaskRound } from "lucide-react";
 
 const Index = () => {
@@ -24,7 +23,6 @@ const Index = () => {
           <MassBalanceCalculator />
           <TitrationCalculator />
           <ChlorineCalculator />
-          <PeroxideCalculator />
         </div>
 
         <footer className="text-center mt-12 text-sm text-muted-foreground">
