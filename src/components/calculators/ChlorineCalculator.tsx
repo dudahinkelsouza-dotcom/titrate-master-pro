@@ -23,6 +23,7 @@ export const ChlorineCalculator = () => {
   const [volumeSample, setVolumeSample] = useState("");
   const [result, setResult] = useState<number | null>(null);
   const [isOutOfRange, setIsOutOfRange] = useState(false);
+  const [suggestedVolume, setSuggestedVolume] = useState<number | null>(null);
 
   const calculateConcentration = () => {
     const vTitrant = parseFloat(volumeTitrant);
@@ -45,8 +46,30 @@ export const ChlorineCalculator = () => {
       }
       
       const specs = productSpecs[productType];
-      setIsOutOfRange(concentration < specs.min || concentration > specs.max);
+      const outOfRange = concentration < specs.min || concentration > specs.max;
+      setIsOutOfRange(outOfRange);
       setResult(concentration);
+      
+      // Se fora do padrão, calcular volume sugerido para atingir o meio do range
+      if (outOfRange) {
+        const targetConcentration = (specs.min + specs.max) / 2;
+        let suggestedVol = 0;
+        
+        if (productType === "bleach_chlorine") {
+          // targetConcentration = (V * n * 35.45 * 2) / vSample / 10000
+          suggestedVol = (targetConcentration * 10000 * vSample) / (n * 35.45 * 2);
+        } else if (productType === "bleach_peroxide") {
+          // targetConcentration = (V * n * 1.701) / vSample
+          suggestedVol = (targetConcentration * vSample) / (n * 1.701);
+        } else {
+          // targetConcentration = (V * n * 3.545) / vSample
+          suggestedVol = (targetConcentration * vSample) / (n * 3.545);
+        }
+        
+        setSuggestedVolume(suggestedVol);
+      } else {
+        setSuggestedVolume(null);
+      }
     }
   };
 
@@ -123,33 +146,49 @@ export const ChlorineCalculator = () => {
         </Button>
 
         {result !== null && (
-          <>
-            <div className={`p-4 rounded-lg shadow-result ${isOutOfRange ? 'bg-destructive' : 'bg-gradient-primary'}`}>
-              <p className="text-sm font-medium text-primary-foreground mb-1">
-                Concentração de {productSpecs[productType].name}
+          <div className="space-y-3">
+            <div className="p-4 bg-gradient-primary rounded-lg shadow-result">
+              <p className="text-sm font-medium text-primary-foreground mb-2">
+                Concentração Calculada
               </p>
               <p className="text-2xl font-bold text-primary-foreground">
-                {result.toFixed(3)}%
+                {result.toFixed(2)} {productSpecs[productType].unit}
               </p>
-              <p className="text-xs text-primary-foreground/80 mt-2">
-                Faixa esperada: {productSpecs[productType].min}% - {productSpecs[productType].max}%
+              <p className="text-xs text-primary-foreground/80 mt-1">
+                Padrão esperado: {productSpecs[productType].min} - {productSpecs[productType].max} {productSpecs[productType].unit}
               </p>
             </div>
-            
+
             {isOutOfRange && (
-              <div className="p-3 bg-destructive/20 border border-destructive rounded-lg flex items-start gap-2">
-                <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-destructive">
-                    Concentração fora do padrão!
-                  </p>
-                  <p className="text-xs text-destructive/80 mt-1">
-                    O resultado está fora da faixa de segurança e qualidade esperada ({productSpecs[productType].min}% - {productSpecs[productType].max}%).
-                  </p>
+              <>
+                <div className="p-4 bg-destructive/20 rounded-lg border border-destructive/30 flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-destructive">
+                      Atenção: Concentração Fora do Padrão
+                    </p>
+                    <p className="text-xs text-destructive/80 mt-1">
+                      O valor está {result < productSpecs[productType].min ? "abaixo" : "acima"} do esperado para {productSpecs[productType].name}.
+                    </p>
+                  </div>
                 </div>
-              </div>
+
+                {suggestedVolume !== null && (
+                  <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                    <p className="text-sm font-medium text-primary mb-2">
+                      💡 Sugestão de Ajuste
+                    </p>
+                    <p className="text-sm text-foreground mb-2">
+                      Para atingir uma concentração ideal de {((productSpecs[productType].min + productSpecs[productType].max) / 2).toFixed(2)}{productSpecs[productType].unit}, use:
+                    </p>
+                    <p className="text-base font-semibold text-primary">
+                      Volume do Titulante: {suggestedVolume.toFixed(2)} mL
+                    </p>
+                  </div>
+                )}
+              </>
             )}
-          </>
+          </div>
         )}
       </CardContent>
     </Card>
