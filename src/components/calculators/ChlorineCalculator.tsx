@@ -9,11 +9,11 @@ import { Droplet, AlertTriangle } from "lucide-react";
 type ProductType = "bleach_chlorine" | "bleach_peroxide" | "disinfectant" | "antifungal" | "multipurpose";
 
 const productSpecs = {
-  bleach_chlorine: { name: "Alvejante com Cloro (NaOCl)", min: 3, max: 10, unit: "%" },
-  bleach_peroxide: { name: "Alvejante sem Cloro (H₂O₂)", min: 3, max: 6, unit: "%" },
-  disinfectant: { name: "Desinfetante (QACs)", min: 0.05, max: 0.2, unit: "%" },
-  antifungal: { name: "Anti-mofo", min: 0.1, max: 2, unit: "%" },
-  multipurpose: { name: "Multiuso (Tensoativos)", min: 2, max: 8, unit: "%" }
+  bleach_chlorine: { name: "Água Sanitária", min: 3, max: 10, unit: "%" },
+  bleach_peroxide: { name: "Alvejante Sem Cloro", min: 3, max: 6, unit: "%" },
+  disinfectant: { name: "Desinfetante Perfumado", min: 0.05, max: 0.2, unit: "%" },
+  antifungal: { name: "Removedor de Mofo", min: 0.1, max: 2, unit: "%" },
+  multipurpose: { name: "Limpador Multiuso", min: 2, max: 8, unit: "%" }
 };
 
 export const ChlorineCalculator = () => {

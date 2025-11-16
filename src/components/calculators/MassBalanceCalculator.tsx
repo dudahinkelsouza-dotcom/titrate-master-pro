@@ -19,8 +19,8 @@ type ReactionResult = {
 
 const reactions = {
   "neutralization": {
-    name: "Neutralização (HCl + NaOH)",
-    reagents: ["HCl", "NaOH"],
+    name: "Produção de Sal e Água",
+    reagents: ["Ácido", "Base"],
     calculate: (quantities: number[]) => {
       const [hcl, naoh] = quantities;
       const limiting = Math.min(hcl / 36.5, naoh / 40);
@@ -38,8 +38,8 @@ const reactions = {
     }
   },
   "chlorine_bleach": {
-    name: "Produção de Hipoclorito (Cl₂ + NaOH)",
-    reagents: ["Cl₂", "NaOH"],
+    name: "Produção de Água Sanitária",
+    reagents: ["Cloro", "Soda Cáustica"],
     calculate: (quantities: number[]) => {
       const [cl2, naoh] = quantities;
       const limiting = Math.min(cl2 / 71, naoh / 80);
@@ -59,8 +59,8 @@ const reactions = {
     }
   },
   "peroxide_synthesis": {
-    name: "Síntese de H₂O₂ (H₂ + O₂)",
-    reagents: ["H₂", "O₂"],
+    name: "Produção de Alvejante Oxigenado",
+    reagents: ["Hidrogênio", "Oxigênio"],
     calculate: (quantities: number[]) => {
       const [h2, o2] = quantities;
       const limiting = Math.min(h2 / 4, o2 / 32);
