@@ -1,5 +1,4 @@
 import { MassBalanceCalculator } from "@/components/calculators/MassBalanceCalculator";
-import { TitrationCalculator } from "@/components/calculators/TitrationCalculator";
 import { ChlorineCalculator } from "@/components/calculators/ChlorineCalculator";
 import { FlaskRound } from "lucide-react";
 
@@ -21,7 +20,6 @@ const Index = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
           <MassBalanceCalculator />
-          <TitrationCalculator />
           <ChlorineCalculator />
         </div>
 
