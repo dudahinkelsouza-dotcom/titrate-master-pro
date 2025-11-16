@@ -69,6 +69,7 @@ export const MassBalanceCalculator = () => {
   ]);
   const [result, setResult] = useState<ReactionResult | null>(null);
   const [unit, setUnit] = useState<"kg" | "L" | "mL">("kg");
+  const [suggestion, setSuggestion] = useState<{ reagent1: number; reagent2: number } | null>(null);
 
   const calculateBalance = () => {
     const reaction = reactions[selectedReaction];
@@ -78,6 +79,35 @@ export const MassBalanceCalculator = () => {
     
     const calculated = reaction.calculate(quantities);
     setResult(calculated);
+    
+    // Verificar se há excesso > 1kg e sugerir ajustes
+    const totalWaste = calculated.waste.reduce((sum, w) => sum + w.quantity, 0);
+    if (totalWaste > 1) {
+      // Calcular quantidades ideais para minimizar descarte (objetivo: 1kg de descarte)
+      const [q1, q2] = quantities;
+      
+      if (selectedReaction === "chlorine_bleach") {
+        // Cl2 / 71 = NaOH / 80, ajustar para ter proporção ideal
+        const ratio = 71 / 80;
+        if (q1 / 71 > q2 / 80) {
+          // Excesso de Cl2, reduzir
+          setSuggestion({ reagent1: q2 * ratio, reagent2: q2 });
+        } else {
+          // Excesso de NaOH, reduzir
+          setSuggestion({ reagent1: q1, reagent2: q1 / ratio });
+        }
+      } else if (selectedReaction === "peroxide_synthesis") {
+        // H2 / 4 = O2 / 32
+        const ratio = 4 / 32;
+        if (q1 / 4 > q2 / 32) {
+          setSuggestion({ reagent1: q2 * ratio, reagent2: q2 });
+        } else {
+          setSuggestion({ reagent1: q1, reagent2: q1 / ratio });
+        }
+      }
+    } else {
+      setSuggestion(null);
+    }
   };
 
   const handleReactionChange = (value: keyof typeof reactions) => {
@@ -87,6 +117,7 @@ export const MassBalanceCalculator = () => {
       { name: reactions[value].reagents[1], quantity: "" }
     ]);
     setResult(null);
+    setSuggestion(null);
   };
 
   const convertUnit = (valueKg: number) => {
@@ -205,6 +236,25 @@ export const MassBalanceCalculator = () => {
                     {waste.name}: {convertUnit(waste.quantity).toFixed(3)} {getUnitLabel()}
                   </p>
                 ))}
+              </div>
+            )}
+
+            {suggestion && (
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <p className="text-sm font-medium text-primary mb-2">
+                  💡 Sugestão para Reduzir Descarte
+                </p>
+                <p className="text-sm text-foreground">
+                  Para minimizar o descarte, use estas quantidades:
+                </p>
+                <div className="mt-2 space-y-1">
+                  <p className="text-base font-semibold text-primary">
+                    {reactions[selectedReaction].reagents[0]}: {suggestion.reagent1.toFixed(2)} kg
+                  </p>
+                  <p className="text-base font-semibold text-primary">
+                    {reactions[selectedReaction].reagents[1]}: {suggestion.reagent2.toFixed(2)} kg
+                  </p>
+                </div>
               </div>
             )}
           </div>
