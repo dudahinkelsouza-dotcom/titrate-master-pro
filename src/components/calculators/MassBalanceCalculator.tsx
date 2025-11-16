@@ -18,25 +18,6 @@ type ReactionResult = {
 };
 
 const reactions = {
-  "neutralization": {
-    name: "Produção de Sal e Água",
-    reagents: ["Ácido", "Base"],
-    calculate: (quantities: number[]) => {
-      const [hcl, naoh] = quantities;
-      const limiting = Math.min(hcl / 36.5, naoh / 40);
-      return {
-        products: [
-          { name: "NaCl (Sal)", quantity: limiting * 58.5 },
-          { name: "H₂O (Água)", quantity: limiting * 18 }
-        ],
-        byproducts: [],
-        waste: [
-          { name: "HCl em excesso", quantity: Math.max(0, hcl - limiting * 36.5) },
-          { name: "NaOH em excesso", quantity: Math.max(0, naoh - limiting * 40) }
-        ]
-      };
-    }
-  },
   "chlorine_bleach": {
     name: "Produção de Água Sanitária",
     reagents: ["Cloro", "Soda Cáustica"],
@@ -81,7 +62,7 @@ const reactions = {
 };
 
 export const MassBalanceCalculator = () => {
-  const [selectedReaction, setSelectedReaction] = useState<keyof typeof reactions>("neutralization");
+  const [selectedReaction, setSelectedReaction] = useState<keyof typeof reactions>("chlorine_bleach");
   const [reagents, setReagents] = useState<Reagent[]>([
     { name: "", quantity: "" },
     { name: "", quantity: "" }
